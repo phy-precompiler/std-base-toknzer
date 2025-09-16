@@ -7,21 +7,6 @@
 
 #include "pycore_token.h"
 
-// #include "object.h"
-#define Py_TPFLAGS_HAVE_FINALIZE (1UL << 0)
-#define Py_TPFLAGS_HAVE_VERSION_TAG   (1UL << 18)
-
-#define Py_CONSTANT_NONE 0
-#define Py_CONSTANT_FALSE 1
-#define Py_CONSTANT_TRUE 2
-#define Py_CONSTANT_ELLIPSIS 3
-#define Py_CONSTANT_NOT_IMPLEMENTED 4
-#define Py_CONSTANT_ZERO 5
-#define Py_CONSTANT_ONE 6
-#define Py_CONSTANT_EMPTY_STR 7
-#define Py_CONSTANT_EMPTY_BYTES 8
-#define Py_CONSTANT_EMPTY_TUPLE 9
-
 
 #include "./lexer/state.h"
 #include "./lexer/lexer.h"
@@ -74,7 +59,7 @@ tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
     const char *encoding = NULL;
 
     fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
-            /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, /*varpos*/ 0, argsbuf);
+            /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, argsbuf);
     if (!fastargs) {
         goto exit;
     }
@@ -182,6 +167,85 @@ tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
 
     return (PyObject *)self;
 }
+
+
+// "Include/internal/pycore_critical_section.h"
+#ifdef Py_GIL_DISABLED
+#else  /* !Py_GIL_DISABLED */
+# define _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(op)
+#endif  /* !Py_GIL_DISABLED */
+
+// "Include/cpython/critical_section.h"
+#ifndef Py_GIL_DISABLED
+# define Py_BEGIN_CRITICAL_SECTION(op)      \
+    {
+# define Py_BEGIN_CRITICAL_SECTION_MUTEX(mutex)    \
+    {
+# define Py_END_CRITICAL_SECTION()          \
+    }
+# define Py_BEGIN_CRITICAL_SECTION2(a, b)   \
+    {
+# define Py_BEGIN_CRITICAL_SECTION2_MUTEX(m1, m2)  \
+    {
+# define Py_END_CRITICAL_SECTION2()         \
+    }
+#else /* !Py_GIL_DISABLED */
+#endif
+
+
+// "Parser/pegen.c"
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset_raw(const char* str, Py_ssize_t col_offset)
+{
+    Py_ssize_t len = (Py_ssize_t)strlen(str);
+    if (col_offset > len + 1) {
+        col_offset = len + 1;
+    }
+    assert(col_offset >= 0);
+    PyObject *text = PyUnicode_DecodeUTF8(str, col_offset, "replace");
+    if (!text) {
+        return -1;
+    }
+    Py_ssize_t size = PyUnicode_GET_LENGTH(text);
+    Py_DECREF(text);
+    return size;
+}
+
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset(PyObject *line, Py_ssize_t col_offset)
+{
+    const char *str = PyUnicode_AsUTF8(line);
+    if (!str) {
+        return -1;
+    }
+    return _PyPegen_byte_offset_to_character_offset_raw(str, col_offset);
+}
+
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset_line(PyObject *line, Py_ssize_t col_offset, Py_ssize_t end_col_offset)
+{
+    const unsigned char *data = (const unsigned char*)PyUnicode_AsUTF8(line);
+
+    Py_ssize_t len = 0;
+    while (col_offset < end_col_offset) {
+        Py_UCS4 ch = data[col_offset];
+        if (ch < 0x80) {
+            col_offset += 1;
+        } else if ((ch & 0xe0) == 0xc0) {
+            col_offset += 2;
+        } else if ((ch & 0xf0) == 0xe0) {
+            col_offset += 3;
+        } else if ((ch & 0xf8) == 0xf0) {
+            col_offset += 4;
+        } else {
+            PyErr_SetString(PyExc_ValueError, "Invalid UTF-8 sequence");
+            return -1;
+        }
+        len++;
+    }
+    return len;
+}
+
 
 static int
 _tokenizer_error(tokenizeriterobject *it)
@@ -363,7 +427,8 @@ tokenizeriter_next(PyObject *op)
     }
     PyObject *str = NULL;
     if (token.start == NULL || token.end == NULL) {
-        str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        // str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        str = PyUnicode_FromString("");
     }
     else {
         str = PyUnicode_FromStringAndSize(token.start, token.end - token.start);
@@ -381,7 +446,8 @@ tokenizeriter_next(PyObject *op)
     PyObject* line = NULL;
     int line_changed = 1;
     if (it->tok->tok_extra_tokens && is_trailing_token) {
-        line = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        // line = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        line = PyUnicode_FromString("");
     } else {
         Py_ssize_t size = it->tok->inp - line_start;
         if (size >= 1 && it->tok->implicit_newline) {
@@ -426,7 +492,8 @@ tokenizeriter_next(PyObject *op)
         else if (type == NL) {
             if (it->tok->implicit_newline) {
                 Py_DECREF(str);
-                str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+                // str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+                str = PyUnicode_FromString("");
             }
         }
 
