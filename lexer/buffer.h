@@ -1,7 +1,7 @@
 #ifndef _LEXER_BUFFER_H_
 #define _LEXER_BUFFER_H_
 
-#include "pyport.h"
+// #include "pyport.h"
 
 void _PyLexer_remember_fstring_buffers(struct tok_state *tok);
 void _PyLexer_restore_fstring_buffers(struct tok_state *tok);

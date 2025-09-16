@@ -36,25 +36,27 @@ static PyObject *
 tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
 {
     PyObject *return_value = NULL;
-    #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
+    // #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
 
-    #define NUM_KEYWORDS 2
-    static struct {
-        PyGC_Head _this_is_not_used;
-        PyObject_VAR_HEAD
-        Py_hash_t ob_hash;
-        PyObject *ob_item[NUM_KEYWORDS];
-    } _kwtuple = {
-        .ob_base = PyVarObject_HEAD_INIT(&PyTuple_Type, NUM_KEYWORDS)
-        .ob_hash = -1,
-        .ob_item = { &_Py_ID(extra_tokens), &_Py_ID(encoding), },
-    };
-    #undef NUM_KEYWORDS
-    #define KWTUPLE (&_kwtuple.ob_base.ob_base)
+    // #define NUM_KEYWORDS 2
+    // static struct {
+    //     PyGC_Head _this_is_not_used;
+    //     PyObject_VAR_HEAD
+    //     Py_hash_t ob_hash;
+    //     PyObject *ob_item[NUM_KEYWORDS];
+    // } _kwtuple = {
+    //     .ob_base = PyVarObject_HEAD_INIT(&PyTuple_Type, NUM_KEYWORDS)
+    //     .ob_hash = -1,
+    //     .ob_item = { &_Py_ID(extra_tokens), &_Py_ID(encoding), },
+    // };
+    // #undef NUM_KEYWORDS
+    // #define KWTUPLE (&_kwtuple.ob_base.ob_base)
 
-    #else  // !Py_BUILD_CORE
-    #  define KWTUPLE NULL
-    #endif  // !Py_BUILD_CORE
+    // #else  // !Py_BUILD_CORE
+    // #  define KWTUPLE NULL
+    // #endif  // !Py_BUILD_CORE
+
+    #define KWTUPLE NULL
 
     static const char * const _keywords[] = {"", "extra_tokens", "encoding", NULL};
     static _PyArg_Parser _parser = {
