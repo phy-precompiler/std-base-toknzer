@@ -1,16 +1,179 @@
 /** copy from "cpython/Python/Python-tokenize.c" */
 
-// tThese includes can be found in system include path, if python development 
+// these includes can be found in system include path, if python development 
 // files are installed
 #include "Python.h"
 #include "errcode.h"
 
-#include "pycore_token.h"
-#include "object.h"
+// #include "pycore_token.h"
+#define ENDMARKER       0
+#define NAME            1
+#define NUMBER          2
+#define STRING          3
+#define NEWLINE         4
+#define INDENT          5
+#define DEDENT          6
+#define LPAR            7
+#define RPAR            8
+#define LSQB            9
+#define RSQB            10
+#define COLON           11
+#define COMMA           12
+#define SEMI            13
+#define PLUS            14
+#define MINUS           15
+#define STAR            16
+#define SLASH           17
+#define VBAR            18
+#define AMPER           19
+#define LESS            20
+#define GREATER         21
+#define EQUAL           22
+#define DOT             23
+#define PERCENT         24
+#define LBRACE          25
+#define RBRACE          26
+#define EQEQUAL         27
+#define NOTEQUAL        28
+#define LESSEQUAL       29
+#define GREATEREQUAL    30
+#define TILDE           31
+#define CIRCUMFLEX      32
+#define LEFTSHIFT       33
+#define RIGHTSHIFT      34
+#define DOUBLESTAR      35
+#define PLUSEQUAL       36
+#define MINEQUAL        37
+#define STAREQUAL       38
+#define SLASHEQUAL      39
+#define PERCENTEQUAL    40
+#define AMPEREQUAL      41
+#define VBAREQUAL       42
+#define CIRCUMFLEXEQUAL 43
+#define LEFTSHIFTEQUAL  44
+#define RIGHTSHIFTEQUAL 45
+#define DOUBLESTAREQUAL 46
+#define DOUBLESLASH     47
+#define DOUBLESLASHEQUAL 48
+#define AT              49
+#define ATEQUAL         50
+#define RARROW          51
+#define ELLIPSIS        52
+#define COLONEQUAL      53
+#define EXCLAMATION     54
+#define OP              55
+#define TYPE_IGNORE     56
+#define TYPE_COMMENT    57
+#define SOFT_KEYWORD    58
+#define FSTRING_START   59
+#define FSTRING_MIDDLE  60
+#define FSTRING_END     61
+#define TSTRING_START   62
+#define TSTRING_MIDDLE  63
+#define TSTRING_END     64
+#define COMMENT         65
+#define NL              66
+#define ERRORTOKEN      67
+#define N_TOKENS        69
+#define NT_OFFSET       256
+
+// #include "object.h"
+#define Py_TPFLAGS_HAVE_FINALIZE (1UL << 0)
+#define Py_TPFLAGS_HAVE_VERSION_TAG   (1UL << 18)
+
+#define Py_CONSTANT_NONE 0
+#define Py_CONSTANT_FALSE 1
+#define Py_CONSTANT_TRUE 2
+#define Py_CONSTANT_ELLIPSIS 3
+#define Py_CONSTANT_NOT_IMPLEMENTED 4
+#define Py_CONSTANT_ZERO 5
+#define Py_CONSTANT_ONE 6
+#define Py_CONSTANT_EMPTY_STR 7
+#define Py_CONSTANT_EMPTY_BYTES 8
+#define Py_CONSTANT_EMPTY_TUPLE 9
+
 
 #include "./lexer/state.h"
 #include "./lexer/lexer.h"
 #include "./tokenizer/tokenizer.h"
+
+// #include "clinic/Python-tokenize.c.h"
+static PyObject *
+tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
+                       int extra_tokens, const char *encoding);
+
+static PyObject *
+tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+{
+    PyObject *return_value = NULL;
+    #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
+
+    #define NUM_KEYWORDS 2
+    static struct {
+        PyGC_Head _this_is_not_used;
+        PyObject_VAR_HEAD
+        Py_hash_t ob_hash;
+        PyObject *ob_item[NUM_KEYWORDS];
+    } _kwtuple = {
+        .ob_base = PyVarObject_HEAD_INIT(&PyTuple_Type, NUM_KEYWORDS)
+        .ob_hash = -1,
+        .ob_item = { &_Py_ID(extra_tokens), &_Py_ID(encoding), },
+    };
+    #undef NUM_KEYWORDS
+    #define KWTUPLE (&_kwtuple.ob_base.ob_base)
+
+    #else  // !Py_BUILD_CORE
+    #  define KWTUPLE NULL
+    #endif  // !Py_BUILD_CORE
+
+    static const char * const _keywords[] = {"", "extra_tokens", "encoding", NULL};
+    static _PyArg_Parser _parser = {
+        .keywords = _keywords,
+        .fname = "tokenizeriter",
+        .kwtuple = KWTUPLE,
+    };
+    #undef KWTUPLE
+    PyObject *argsbuf[3];
+    PyObject * const *fastargs;
+    Py_ssize_t nargs = PyTuple_GET_SIZE(args);
+    Py_ssize_t noptargs = nargs + (kwargs ? PyDict_GET_SIZE(kwargs) : 0) - 2;
+    PyObject *readline;
+    int extra_tokens;
+    const char *encoding = NULL;
+
+    fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
+            /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, /*varpos*/ 0, argsbuf);
+    if (!fastargs) {
+        goto exit;
+    }
+    readline = fastargs[0];
+    extra_tokens = PyObject_IsTrue(fastargs[1]);
+    if (extra_tokens < 0) {
+        goto exit;
+    }
+    if (!noptargs) {
+        goto skip_optional_kwonly;
+    }
+    if (!PyUnicode_Check(fastargs[2])) {
+        _PyArg_BadArgument("tokenizeriter", "argument 'encoding'", "str", fastargs[2]);
+        goto exit;
+    }
+    Py_ssize_t encoding_length;
+    encoding = PyUnicode_AsUTF8AndSize(fastargs[2], &encoding_length);
+    if (encoding == NULL) {
+        goto exit;
+    }
+    if (strlen(encoding) != (size_t)encoding_length) {
+        PyErr_SetString(PyExc_ValueError, "embedded null character");
+        goto exit;
+    }
+skip_optional_kwonly:
+    return_value = tokenizeriter_new_impl(type, readline, extra_tokens, encoding);
+
+exit:
+    return return_value;
+}                       
+
 
 static struct PyModuleDef _tokenizemodule;
 
@@ -405,7 +568,7 @@ static PyMethodDef tokenize_methods[] = {
 static PyModuleDef_Slot tokenizemodule_slots[] = {
     {Py_mod_exec, tokenizemodule_exec},
     {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
-    {Py_mod_gil, Py_MOD_GIL_NOT_USED},
+    // {Py_mod_gil, Py_MOD_GIL_NOT_USED},  // this GIL related macros are introduced since 3.13
     {0, NULL}
 };
 

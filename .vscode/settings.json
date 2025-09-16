@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "errcode.h": "c",
-        "python.h": "c"
+        "python.h": "c",
+        "pycore_token.h": "c"
     }
 }
