@@ -2,6 +2,9 @@
     "files.associations": {
         "errcode.h": "c",
         "python.h": "c",
-        "pycore_token.h": "c"
+        "pycore_token.h": "c",
+        "state.h": "c",
+        "object.h": "c",
+        "pycore_pystate.h": "c"
     }
 }

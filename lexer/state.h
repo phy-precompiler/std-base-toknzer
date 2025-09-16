@@ -1,7 +1,7 @@
 #ifndef _PY_LEXER_H_
 #define _PY_LEXER_H_
 
-#include "object.h"
+// #include "object.h"
 
 #define MAXINDENT 100       /* Max indentation level */
 #define MAXLEVEL 200        /* Max parentheses level */
