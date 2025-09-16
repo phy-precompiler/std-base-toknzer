@@ -1,13 +1,16 @@
 /** copy from "cpython/Python/Python-tokenize.c" */
 
-
+// tThese includes can be found in system include path, if python development 
+// files are installed
 #include "Python.h"
 #include "errcode.h"
-#include "internal/pycore_critical_section.h"   // Py_BEGIN_CRITICAL_SECTION
-#include "../Parser/lexer/state.h"
-#include "../Parser/lexer/lexer.h"
-#include "../Parser/tokenizer/tokenizer.h"
-#include "../Parser/pegen.h"                    // _PyPegen_byte_offset_to_character_offset()
+
+#include "pycore_token.h"
+#include "object.h"
+
+#include "./lexer/state.h"
+#include "./lexer/lexer.h"
+#include "./tokenizer/tokenizer.h"
 
 static struct PyModuleDef _tokenizemodule;
 
@@ -23,8 +26,6 @@ get_tokenize_state(PyObject *module) {
 #define _tokenize_get_state_by_type(type) \
     get_tokenize_state(PyType_GetModuleByDef(type, &_tokenizemodule))
 
-#include "pycore_runtime.h"
-#include "clinic/Python-tokenize.c.h"
 
 /*[clinic input]
 module _tokenizer
