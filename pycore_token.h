@@ -7,9 +7,9 @@
 extern "C" {
 #endif
 
-#ifndef Py_BUILD_CORE
-#  error "this header requires Py_BUILD_CORE define"
-#endif
+// #ifndef Py_BUILD_CORE
+// #  error "this header requires Py_BUILD_CORE define"
+// #endif
 
 #undef TILDE   /* Prevent clash of our definition with system macro. Ex AIX, ioctl.h */
 

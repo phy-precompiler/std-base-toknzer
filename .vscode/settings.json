@@ -5,6 +5,8 @@
         "pycore_token.h": "c",
         "state.h": "c",
         "object.h": "c",
-        "pycore_pystate.h": "c"
+        "pycore_pystate.h": "c",
+        "lexer.h": "c",
+        "helpers.h": "c"
     }
 }
