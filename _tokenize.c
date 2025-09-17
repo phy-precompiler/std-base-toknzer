@@ -9,6 +9,8 @@
 #include <errcode.h>
 
 // include local headers
+#include "_tokenize.h"
+
 /// this header has been refactored to contains only token type constants
 #include "pycore_token.h"
 
@@ -76,9 +78,10 @@ _PyPegen_byte_offset_to_character_offset_line(PyObject *line, Py_ssize_t col_off
 /// define module in other file
 /// static struct PyModuleDef _tokenizemodule;
 
-typedef struct {
-    PyTypeObject *TokenizerIter;
-} tokenize_state;
+/// move to `_tokenize.h`
+/// typedef struct {
+///     PyTypeObject *TokenizerIter;
+/// } tokenize_state;
 
 static tokenize_state *
 get_tokenize_state(PyObject *module) {
@@ -712,7 +715,7 @@ static PyType_Spec tokenizeriter_spec = {
     .slots = tokenizeriter_slots,
 };
 
-static int
+/* static */ int
 tokenizemodule_exec(PyObject *m)
 {
     tokenize_state *state = get_tokenize_state(m);
@@ -743,7 +746,7 @@ static PyModuleDef_Slot tokenizemodule_slots[] = {
     {0, NULL}
 };
 
-static int
+/* static */ int
 tokenizemodule_traverse(PyObject *m, visitproc visit, void *arg)
 {
     tokenize_state *state = get_tokenize_state(m);
@@ -751,7 +754,7 @@ tokenizemodule_traverse(PyObject *m, visitproc visit, void *arg)
     return 0;
 }
 
-static int
+/* static */ int
 tokenizemodule_clear(PyObject *m)
 {
     tokenize_state *state = get_tokenize_state(m);
@@ -759,7 +762,7 @@ tokenizemodule_clear(PyObject *m)
     return 0;
 }
 
-static void
+/* static */ void
 tokenizemodule_free(void *m)
 {
     tokenizemodule_clear((PyObject *)m);
