@@ -275,6 +275,14 @@ _PyArg_UnpackKeywords(PyObject *const *args, Py_ssize_t nargs,
     return buf;
 }
 
+#define _PyArg_UnpackKeywords(args, nargs, kwargs, kwnames, parser, minpos, maxpos, minkw, varpos, buf) \
+    (((minkw) == 0 && (kwargs) == NULL && (kwnames) == NULL && \
+      (minpos) <= (nargs) && ((varpos) || (nargs) <= (maxpos)) && (args) != NULL) ? \
+      (args) : \
+     _PyArg_UnpackKeywords((args), (nargs), (kwargs), (kwnames), (parser), \
+                           (minpos), (maxpos), (minkw), (varpos), (buf)))
+
+
 /// only one function of `Python-tokenize.c.h` is included; hence expended to inline
 /// #include "clinic/Python-tokenize.c.h"
 static PyObject *
@@ -319,7 +327,7 @@ tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
     const char *encoding = NULL;
 
     /// `_PyArg_UnpackKeywords` is not a consistent symbol across python versions, has to be refactored
-     fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
+    fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
              /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, /*varpos*/ 0, argsbuf);
     
     if (!fastargs) {
@@ -419,10 +427,11 @@ tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
 static int
 _tokenizer_error(tokenizeriterobject *it)
 {
-    _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
-    if (PyErr_Occurred()) {
-        return -1;
-    }
+    /// GIL related macros are ignored
+    /// _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
+    /// if (PyErr_Occurred()) {
+    ///     return -1;
+    /// }
 
     const char *msg = NULL;
     PyObject* errtype = PyExc_SyntaxError;
@@ -578,7 +587,8 @@ tokenizeriter_next(PyObject *op)
     tokenizeriterobject *it = (tokenizeriterobject*)op;
     PyObject* result = NULL;
 
-    Py_BEGIN_CRITICAL_SECTION(it);
+    /// GIL related macros are ignored
+    /// Py_BEGIN_CRITICAL_SECTION(it);
 
     struct token token;
     _PyToken_Init(&token);
@@ -684,7 +694,8 @@ exit:
         it->done = 1;
     }
 
-    Py_END_CRITICAL_SECTION();
+    /// GIL related macros are ignored
+    /// Py_END_CRITICAL_SECTION();
     return result;
 }
 
