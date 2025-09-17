@@ -25,3 +25,4 @@ def test_std_base_toknzer():
     _iter = std_base_toknzer.TokenizerIter(code_readline, encoding='utf-8')
     for _token in _iter:
         print(_token)
+        print(type(_token))
