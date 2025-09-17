@@ -8,6 +8,13 @@
 #include <Python.h>
 
 /** symbols declaration */
+static PyObject *
+tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
+                       int extra_tokens, const char *encoding);
+
+static PyObject *
+tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs);
+
 typedef struct {
     PyTypeObject *TokenizerIter;
 } tokenize_state;
