@@ -1,46 +1,122 @@
-/** copy from "cpython/Python/Python-tokenize.c" */
+/** This file is copied from "cpython/Python/Python-tokenize.c" of 3.14 branch. 
+ * 
+ * Internal header includes, GIL related macros are refactored or ignored.
+*/
 
-// these includes can be found in system include path, if python development 
-// files are installed
-#include "Python.h"
-#include "errcode.h"
+/** includes */
+// include python headers
+#include <Python.h>
+#include <errcode.h>
 
+// include local headers
+/// this header has been refactored to contains only token type constants
 #include "pycore_token.h"
 
-
+/// DO NOT include python internal headers  
+/// #include "internal/pycore_critical_section.h"   // Py_BEGIN_CRITICAL_SECTION
 #include "./lexer/state.h"
 #include "./lexer/lexer.h"
 #include "./tokenizer/tokenizer.h"
 
-// #include "clinic/Python-tokenize.c.h"
-static PyObject *
-tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
-                       int extra_tokens, const char *encoding);
+/// only few functions of `pegen.h` are included; hence expended to inline
+/// #include "./pegen.h"                    // _PyPegen_byte_offset_to_character_offset()
+/// functions defined in "Parser/pegen.c"
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset_raw(const char* str, Py_ssize_t col_offset)
+{
+    Py_ssize_t len = (Py_ssize_t)strlen(str);
+    if (col_offset > len + 1) {
+        col_offset = len + 1;
+    }
+    assert(col_offset >= 0);
+    PyObject *text = PyUnicode_DecodeUTF8(str, col_offset, "replace");
+    if (!text) {
+        return -1;
+    }
+    Py_ssize_t size = PyUnicode_GET_LENGTH(text);
+    Py_DECREF(text);
+    return size;
+}
 
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset(PyObject *line, Py_ssize_t col_offset)
+{
+    const char *str = PyUnicode_AsUTF8(line);
+    if (!str) {
+        return -1;
+    }
+    return _PyPegen_byte_offset_to_character_offset_raw(str, col_offset);
+}
+
+Py_ssize_t
+_PyPegen_byte_offset_to_character_offset_line(PyObject *line, Py_ssize_t col_offset, Py_ssize_t end_col_offset)
+{
+    const unsigned char *data = (const unsigned char*)PyUnicode_AsUTF8(line);
+
+    Py_ssize_t len = 0;
+    while (col_offset < end_col_offset) {
+        Py_UCS4 ch = data[col_offset];
+        if (ch < 0x80) {
+            col_offset += 1;
+        } else if ((ch & 0xe0) == 0xc0) {
+            col_offset += 2;
+        } else if ((ch & 0xf0) == 0xe0) {
+            col_offset += 3;
+        } else if ((ch & 0xf8) == 0xf0) {
+            col_offset += 4;
+        } else {
+            PyErr_SetString(PyExc_ValueError, "Invalid UTF-8 sequence");
+            return -1;
+        }
+        len++;
+    }
+    return len;
+}
+
+/// define module in other file
+/// static struct PyModuleDef _tokenizemodule;
+
+typedef struct {
+    PyTypeObject *TokenizerIter;
+} tokenize_state;
+
+static tokenize_state *
+get_tokenize_state(PyObject *module) {
+    return (tokenize_state *)PyModule_GetState(module);
+}
+
+#define _tokenize_get_state_by_type(type) \
+    get_tokenize_state(PyType_GetModuleByDef(type, &_tokenizemodule))
+
+/// DO NOT include python internal headers 
+/// #include "pycore_runtime.h"
+
+/// only one function of `Python-tokenize.c.h` is included; hence expended to inline
+/// #include "clinic/Python-tokenize.c.h"
 static PyObject *
 tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
 {
     PyObject *return_value = NULL;
-    // #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
-
-    // #define NUM_KEYWORDS 2
-    // static struct {
-    //     PyGC_Head _this_is_not_used;
-    //     PyObject_VAR_HEAD
-    //     Py_hash_t ob_hash;
-    //     PyObject *ob_item[NUM_KEYWORDS];
-    // } _kwtuple = {
-    //     .ob_base = PyVarObject_HEAD_INIT(&PyTuple_Type, NUM_KEYWORDS)
-    //     .ob_hash = -1,
-    //     .ob_item = { &_Py_ID(extra_tokens), &_Py_ID(encoding), },
-    // };
-    // #undef NUM_KEYWORDS
-    // #define KWTUPLE (&_kwtuple.ob_base.ob_base)
-
-    // #else  // !Py_BUILD_CORE
-    // #  define KWTUPLE NULL
-    // #endif  // !Py_BUILD_CORE
-
+    /// Cpython build macros are ignored
+    /// #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
+    ///
+    /// #define NUM_KEYWORDS 2
+    /// static struct {
+    ///     PyGC_Head _this_is_not_used;
+    ///     PyObject_VAR_HEAD
+    ///     Py_hash_t ob_hash;
+    ///     PyObject *ob_item[NUM_KEYWORDS];
+    /// } _kwtuple = {
+    ///     .ob_base = PyVarObject_HEAD_INIT(&PyTuple_Type, NUM_KEYWORDS)
+    ///     .ob_hash = -1,
+    ///     .ob_item = { &_Py_ID(extra_tokens), &_Py_ID(encoding), },
+    /// };
+    /// #undef NUM_KEYWORDS
+    /// #define KWTUPLE (&_kwtuple.ob_base.ob_base)
+    ///
+    /// #else  // !Py_BUILD_CORE
+    /// #  define KWTUPLE NULL
+    /// #endif  // !Py_BUILD_CORE
     #define KWTUPLE NULL
 
     static const char * const _keywords[] = {"", "extra_tokens", "encoding", NULL};
@@ -58,8 +134,10 @@ tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
     int extra_tokens;
     const char *encoding = NULL;
 
-    fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
-            /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, argsbuf);
+    /// `_PyArg_UnpackKeywords` is not a consistent symbol across python versions, has to be refactored
+    /// fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
+    ///         /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, /*varpos*/ 0, argsbuf);
+    
     if (!fastargs) {
         goto exit;
     }
@@ -89,24 +167,10 @@ skip_optional_kwonly:
 
 exit:
     return return_value;
-}                       
-
-
-static struct PyModuleDef _tokenizemodule;
-
-typedef struct {
-    PyTypeObject *TokenizerIter;
-} tokenize_state;
-
-static tokenize_state *
-get_tokenize_state(PyObject *module) {
-    return (tokenize_state *)PyModule_GetState(module);
 }
 
-#define _tokenize_get_state_by_type(type) \
-    get_tokenize_state(PyType_GetModuleByDef(type, &_tokenizemodule))
 
-
+/// clinic is an internal code generator tool by cpython
 /*[clinic input]
 module _tokenizer
 class _tokenizer.tokenizeriter "tokenizeriterobject *" "_tokenize_get_state_by_type(type)->TokenizerIter"
@@ -167,85 +231,6 @@ tokenizeriter_new_impl(PyTypeObject *type, PyObject *readline,
 
     return (PyObject *)self;
 }
-
-
-// "Include/internal/pycore_critical_section.h"
-#ifdef Py_GIL_DISABLED
-#else  /* !Py_GIL_DISABLED */
-# define _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(op)
-#endif  /* !Py_GIL_DISABLED */
-
-// "Include/cpython/critical_section.h"
-#ifndef Py_GIL_DISABLED
-# define Py_BEGIN_CRITICAL_SECTION(op)      \
-    {
-# define Py_BEGIN_CRITICAL_SECTION_MUTEX(mutex)    \
-    {
-# define Py_END_CRITICAL_SECTION()          \
-    }
-# define Py_BEGIN_CRITICAL_SECTION2(a, b)   \
-    {
-# define Py_BEGIN_CRITICAL_SECTION2_MUTEX(m1, m2)  \
-    {
-# define Py_END_CRITICAL_SECTION2()         \
-    }
-#else /* !Py_GIL_DISABLED */
-#endif
-
-
-// "Parser/pegen.c"
-Py_ssize_t
-_PyPegen_byte_offset_to_character_offset_raw(const char* str, Py_ssize_t col_offset)
-{
-    Py_ssize_t len = (Py_ssize_t)strlen(str);
-    if (col_offset > len + 1) {
-        col_offset = len + 1;
-    }
-    assert(col_offset >= 0);
-    PyObject *text = PyUnicode_DecodeUTF8(str, col_offset, "replace");
-    if (!text) {
-        return -1;
-    }
-    Py_ssize_t size = PyUnicode_GET_LENGTH(text);
-    Py_DECREF(text);
-    return size;
-}
-
-Py_ssize_t
-_PyPegen_byte_offset_to_character_offset(PyObject *line, Py_ssize_t col_offset)
-{
-    const char *str = PyUnicode_AsUTF8(line);
-    if (!str) {
-        return -1;
-    }
-    return _PyPegen_byte_offset_to_character_offset_raw(str, col_offset);
-}
-
-Py_ssize_t
-_PyPegen_byte_offset_to_character_offset_line(PyObject *line, Py_ssize_t col_offset, Py_ssize_t end_col_offset)
-{
-    const unsigned char *data = (const unsigned char*)PyUnicode_AsUTF8(line);
-
-    Py_ssize_t len = 0;
-    while (col_offset < end_col_offset) {
-        Py_UCS4 ch = data[col_offset];
-        if (ch < 0x80) {
-            col_offset += 1;
-        } else if ((ch & 0xe0) == 0xc0) {
-            col_offset += 2;
-        } else if ((ch & 0xf0) == 0xe0) {
-            col_offset += 3;
-        } else if ((ch & 0xf8) == 0xf0) {
-            col_offset += 4;
-        } else {
-            PyErr_SetString(PyExc_ValueError, "Invalid UTF-8 sequence");
-            return -1;
-        }
-        len++;
-    }
-    return len;
-}
-
 
 static int
 _tokenizer_error(tokenizeriterobject *it)
@@ -347,7 +332,8 @@ static PyObject *
 _get_current_line(tokenizeriterobject *it, const char *line_start, Py_ssize_t size,
                   int *line_changed)
 {
-    _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
+    /// GIL related macros are ignored
+    /// _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
     PyObject *line;
     if (it->tok->lineno != it->last_lineno) {
         // Line has changed since last token, so we fetch the new line and cache it
@@ -369,7 +355,8 @@ _get_col_offsets(tokenizeriterobject *it, struct token token, const char *line_s
                  PyObject *line, int line_changed, Py_ssize_t lineno, Py_ssize_t end_lineno,
                  Py_ssize_t *col_offset, Py_ssize_t *end_col_offset)
 {
-    _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
+    /// GIL related macros are ignored
+    /// _Py_CRITICAL_SECTION_ASSERT_OBJECT_LOCKED(it);
     Py_ssize_t byte_offset = -1;
     if (token.start != NULL && token.start >= line_start) {
         byte_offset = token.start - line_start;
@@ -427,7 +414,8 @@ tokenizeriter_next(PyObject *op)
     }
     PyObject *str = NULL;
     if (token.start == NULL || token.end == NULL) {
-        // str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        /// `Py_GetConstant` is not a consistent symbol across python versions, has to be refactored
+        /// str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
         str = PyUnicode_FromString("");
     }
     else {
@@ -446,7 +434,8 @@ tokenizeriter_next(PyObject *op)
     PyObject* line = NULL;
     int line_changed = 1;
     if (it->tok->tok_extra_tokens && is_trailing_token) {
-        // line = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+        /// `Py_GetConstant` is not a consistent symbol across python versions, has to be refactored
+        /// line = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
         line = PyUnicode_FromString("");
     } else {
         Py_ssize_t size = it->tok->inp - line_start;
@@ -492,7 +481,8 @@ tokenizeriter_next(PyObject *op)
         else if (type == NL) {
             if (it->tok->implicit_newline) {
                 Py_DECREF(str);
-                // str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
+                /// `Py_GetConstant` is not a consistent symbol across python versions, has to be refactored
+                /// str = Py_GetConstant(Py_CONSTANT_EMPTY_STR);
                 str = PyUnicode_FromString("");
             }
         }
@@ -566,8 +556,9 @@ static PyMethodDef tokenize_methods[] = {
 
 static PyModuleDef_Slot tokenizemodule_slots[] = {
     {Py_mod_exec, tokenizemodule_exec},
-    {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
-    // {Py_mod_gil, Py_MOD_GIL_NOT_USED},  // this GIL related macros are introduced since 3.13
+    /// GIL related macros are ignored
+    /// {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
+    /// {Py_mod_gil, Py_MOD_GIL_NOT_USED},
     {0, NULL}
 };
 
@@ -593,19 +584,21 @@ tokenizemodule_free(void *m)
     tokenizemodule_clear((PyObject *)m);
 }
 
-static struct PyModuleDef _tokenizemodule = {
-    PyModuleDef_HEAD_INIT,
-    .m_name = "_tokenize",
-    .m_size = sizeof(tokenize_state),
-    .m_slots = tokenizemodule_slots,
-    .m_methods = tokenize_methods,
-    .m_traverse = tokenizemodule_traverse,
-    .m_clear = tokenizemodule_clear,
-    .m_free = tokenizemodule_free,
-};
+/// define module in other file
+/// static struct PyModuleDef _tokenizemodule = {
+///     PyModuleDef_HEAD_INIT,
+///     .m_name = "_tokenize",
+///     .m_size = sizeof(tokenize_state),
+///     .m_slots = tokenizemodule_slots,
+///     .m_methods = tokenize_methods,
+///     .m_traverse = tokenizemodule_traverse,
+///     .m_clear = tokenizemodule_clear,
+///     .m_free = tokenizemodule_free,
+/// };
 
-PyMODINIT_FUNC
-PyInit__tokenize(void)
-{
-    return PyModuleDef_Init(&_tokenizemodule);
-}
+/// define module in other file
+/// PyMODINIT_FUNC
+/// PyInit__tokenize(void)
+/// {
+///     return PyModuleDef_Init(&_tokenizemodule);
+/// }
