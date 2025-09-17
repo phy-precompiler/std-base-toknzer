@@ -34,5 +34,5 @@ static struct PyModuleDef std_base_toknzer_module = {
 
 /** name here must match extension name, with `PyInit_` prefix */
 PyMODINIT_FUNC PyInit_std_base_toknzer(void) {
-    return PyModule_Create(&std_base_toknzer_module);
+    return PyModuleDef_Init(&std_base_toknzer_module);
 }
