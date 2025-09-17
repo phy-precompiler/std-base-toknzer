@@ -100,7 +100,9 @@ static PyObject *
 tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
 {
     PyObject *return_value = NULL;
+    
     /// Cpython build macros are ignored
+
     /// #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
     ///
     /// #define NUM_KEYWORDS 2
@@ -120,54 +122,74 @@ tokenizeriter_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
     /// #else  // !Py_BUILD_CORE
     /// #  define KWTUPLE NULL
     /// #endif  // !Py_BUILD_CORE
-    #define KWTUPLE NULL
 
-    static const char * const _keywords[] = {"", "extra_tokens", "encoding", NULL};
-    static _PyArg_Parser _parser = {
-        .keywords = _keywords,
-        .fname = "tokenizeriter",
-        .kwtuple = KWTUPLE,
-    };
-    #undef KWTUPLE
-    PyObject *argsbuf[3];
-    PyObject * const *fastargs;
-    Py_ssize_t nargs = PyTuple_GET_SIZE(args);
-    Py_ssize_t noptargs = nargs + (kwargs ? PyDict_GET_SIZE(kwargs) : 0) - 2;
-    PyObject *readline;
-    int extra_tokens;
-    const char *encoding = NULL;
+    /// this funtion calls private API `_PyArg_UnpackKeywords`, has to be refactored
 
-    /// `_PyArg_UnpackKeywords` is not a consistent symbol across python versions, and has been 
-    /// removed since 3.13; the following statements has to be refactored
+    /// static const char * const _keywords[] = {"", "extra_tokens", "encoding", NULL};
+    /// static _PyArg_Parser _parser = {
+    ///     .keywords = _keywords,
+    ///     .fname = "tokenizeriter",
+    ///     .kwtuple = KWTUPLE,
+    /// };
+    /// #undef KWTUPLE
+
+    /// PyObject *argsbuf[3];
+    /// PyObject * const *fastargs;
+
+    /// Py_ssize_t nargs = PyTuple_GET_SIZE(args);
+    /// Py_ssize_t noptargs = nargs + (kwargs ? PyDict_GET_SIZE(kwargs) : 0) - 2;
+    /// PyObject *readline;
+    /// int extra_tokens;
+    /// const char *encoding = NULL;
+
     /// fastargs = _PyArg_UnpackKeywords(_PyTuple_CAST(args)->ob_item, nargs, kwargs, NULL, &_parser,
     ///          /*minpos*/ 1, /*maxpos*/ 1, /*minkw*/ 1, /*varpos*/ 0, argsbuf);
-    // fastargs = PyArg_ParseTupleAndKeywords()
+
+    // parse argumenets of:
+    // tokenizeriter_new(args, encoding: str, extra_tokens: bool)
+    PyObject *readline;
+    const char *encoding = NULL;
+    int extra_tokens = 0;
+
+    static char *kwlist[] = {"readline", "encoding", "extra_tokens", NULL};
+    if (!PyArg_ParseTupleAndKeywords(
+            args, kwargs,
+            "O|sp",             // format: O for PyObject; s for string; p for bool
+            kwlist,
+            &readline,
+            &encoding,          // encoding (char*, with defaults)
+            &extra_tokens))     // extra_tokens (int, with defaults, 0/1)
+    {
+        goto exit;
+    }
     
-    if (!fastargs) {
-        goto exit;
-    }
-    readline = fastargs[0];
-    extra_tokens = PyObject_IsTrue(fastargs[1]);
-    if (extra_tokens < 0) {
-        goto exit;
-    }
-    if (!noptargs) {
-        goto skip_optional_kwonly;
-    }
-    if (!PyUnicode_Check(fastargs[2])) {
-        _PyArg_BadArgument("tokenizeriter", "argument 'encoding'", "str", fastargs[2]);
-        goto exit;
-    }
-    Py_ssize_t encoding_length;
-    encoding = PyUnicode_AsUTF8AndSize(fastargs[2], &encoding_length);
-    if (encoding == NULL) {
-        goto exit;
-    }
-    if (strlen(encoding) != (size_t)encoding_length) {
-        PyErr_SetString(PyExc_ValueError, "embedded null character");
-        goto exit;
-    }
-skip_optional_kwonly:
+    /// if (!fastargs) {
+    ///     goto exit;
+    /// }
+
+    /// readline = fastargs[0];
+    /// extra_tokens = PyObject_IsTrue(fastargs[1]);
+    /// if (extra_tokens < 0) {
+    ///     goto exit;
+    /// }
+    /// if (!noptargs) {
+    ///     goto skip_optional_kwonly;
+    /// }
+    /// if (!PyUnicode_Check(fastargs[2])) {
+    ///     _PyArg_BadArgument("tokenizeriter", "argument 'encoding'", "str", fastargs[2]);
+    ///     goto exit;
+    /// }
+    /// Py_ssize_t encoding_length;
+    /// encoding = PyUnicode_AsUTF8AndSize(fastargs[2], &encoding_length);
+    /// if (encoding == NULL) {
+    ///     goto exit;
+    /// }
+    /// if (strlen(encoding) != (size_t)encoding_length) {
+    ///     PyErr_SetString(PyExc_ValueError, "embedded null character");
+    ///     goto exit;
+    /// }
+/// skip_optional_kwonly:
+
     return_value = tokenizeriter_new_impl(type, readline, extra_tokens, encoding);
 
 exit:
