@@ -9,6 +9,7 @@ find_package(
 python_add_library(
   std_base_toknzer MODULE 
   std_base_toknzer_module.c 
+  _tokenize.c
   WITH_SOABI
 )
 

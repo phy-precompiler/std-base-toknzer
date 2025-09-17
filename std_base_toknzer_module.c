@@ -6,36 +6,30 @@
 #include <Python.h>
 
 // include local headers
-
-/** bare c functions */
-int my_add(int x) {
-    return x + 1;
-}
-
-/** python wrapper for c functions */
-static PyObject *my_add_wrapper(PyObject *self, PyObject *args) {
-    float input, result;
-    if (!PyArg_ParseTuple(args, "f", &input))
-    {
-        return NULL;
-    }
-    result = my_add(input);
-    return PyFloat_FromDouble(result);
-}
-
-/** python methods table */
-static PyMethodDef std_base_toknzer_methods[] = {
-    {"my_add", my_add_wrapper, METH_VARARGS, "Add function"},
-    {NULL, NULL, 0, NULL} // mark for terminal
-};
+#include "_tokenize.h"
 
 /** python module definition */
+static PyMethodDef tokenize_methods[] = {
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+static PyModuleDef_Slot tokenizemodule_slots[] = {
+    {Py_mod_exec, tokenizemodule_exec},
+    /// GIL related macros are ignored
+    /// {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
+    /// {Py_mod_gil, Py_MOD_GIL_NOT_USED},
+    {0, NULL}
+};
+
 static struct PyModuleDef std_base_toknzer_module = {
     PyModuleDef_HEAD_INIT, 
     "std_base_toknzer",
-    NULL, 
-    -1, 
-    std_base_toknzer_methods
+    .m_size = sizeof(tokenize_state),
+    .m_slots = tokenizemodule_slots,
+    .m_methods = tokenize_methods,
+    .m_traverse = tokenizemodule_traverse,
+    .m_clear = tokenizemodule_clear,
+    .m_free = tokenizemodule_free
 };
 
 /** name here must match extension name, with `PyInit_` prefix */

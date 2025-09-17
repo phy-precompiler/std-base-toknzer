@@ -1,4 +1,7 @@
-/** Header for `_tokenize.c`. Expose necessary symbols for module definition fields. */
+/** Header for `_tokenize.c`. 
+ * 
+ * Expose necessary symbols for module definition fields. 
+ */
 
 /** includes */
 // include python headers

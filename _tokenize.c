@@ -734,17 +734,18 @@ tokenizemodule_exec(PyObject *m)
     return 0;
 }
 
-static PyMethodDef tokenize_methods[] = {
-    {NULL, NULL, 0, NULL} /* Sentinel */
-};
-
-static PyModuleDef_Slot tokenizemodule_slots[] = {
-    {Py_mod_exec, tokenizemodule_exec},
-    /// GIL related macros are ignored
-    /// {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
-    /// {Py_mod_gil, Py_MOD_GIL_NOT_USED},
-    {0, NULL}
-};
+/// define module in other file
+/// static PyMethodDef tokenize_methods[] = {
+///     {NULL, NULL, 0, NULL} /* Sentinel */
+/// };
+/// 
+/// static PyModuleDef_Slot tokenizemodule_slots[] = {
+///     {Py_mod_exec, tokenizemodule_exec},
+///     /// GIL related macros are ignored
+///     /// {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
+///     /// {Py_mod_gil, Py_MOD_GIL_NOT_USED},
+///     {0, NULL}
+/// };
 
 /* static */ int
 tokenizemodule_traverse(PyObject *m, visitproc visit, void *arg)
