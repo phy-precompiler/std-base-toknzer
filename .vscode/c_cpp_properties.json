@@ -4,8 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/python3.12",
-                "~/.pyenv/versions/3.12.9/include/python3.12"
+                "/usr/include/python3.12"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
