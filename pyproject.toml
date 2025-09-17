@@ -1,7 +1,7 @@
 [project]
 name = "phy-std-base-toknzer"
 version = "0.1.0"
-description = ""
+description = "Base tokenizer for phy project extracted from python 3.14 builtin tokenize module"
 authors = [
     {name = "alfred-du",email = "ihearmywords@hotmail.com"}
 ]
@@ -17,5 +17,14 @@ dev = [
 
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+
+[tool.pytest.ini_options]
+norecursedirs = []
+
+
+[tool.pylint]
+ignore = []
+disable = []

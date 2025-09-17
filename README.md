@@ -1,6 +1,11 @@
 build c module:
 
 ```shell
-gcc -Wall -O3 -shared -fPIC $(python3-config --includes) \
-    _tokenizemodule.c -o _tokenizemodule$(python3-config --extension-suffix)
+uv build
+```
+
+install to venv and test (include build):
+
+```shell
+uv pip install .
 ```
