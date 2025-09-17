@@ -230,6 +230,9 @@ contains_null_bytes(const char* str, size_t size)
     return memchr(str, 0, size) != NULL;
 }
 
+/// "Include/errcode.h"
+#define E_COLUMNOVERFLOW 29      /* Column offset overflow */
+
 /* Get next char, updating state; error code goes into tok->done */
 static int
 tok_nextc(struct tok_state *tok)
