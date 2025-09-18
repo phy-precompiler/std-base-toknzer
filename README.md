@@ -125,6 +125,34 @@ Think of it as a **"frozen" token ID specification**: even as Python evolves, yo
 pip install phy-std-base-toknzer
 ```
 
+## How to use
+
+Use this library is like using builtin method `tokenize.tokenize`:
++ first, import this module `std_base_toknzer`;
++ then, create an `io.IOBase.readline()` object from code string;
++ create an iterator by `TokenizerIter`, which will generate tokens.
+
+The generated token are 4-elements tuple like builtin `tokenize.TokenInfo` object:
+`(type, string, (start_lineno, start_col_offset), (end_lineno, end_col_offset))`.
+
+It is not nameTuple like `tokenize.TokenInfo` gives, you can only get attributes by subscript. `type` is the 
+token type int value defined in `token` module of python 3.14.
+
+```python
+from io import BytesIO
+import std_base_toknzer
+
+code = '''print(f"hello world to {greeter}!")\ntemplate=t"input a {name}"\n'''
+code_readline = BytesIO(code.encode('utf-8')).readline
+
+_iter = std_base_toknzer.TokenizerIter(code_readline, encoding='utf-8')
+for _token in _iter:
+    print(_token)
+    print(type(_token))
+```
+
+
+
 
 ## Development
 
