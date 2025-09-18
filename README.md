@@ -1,4 +1,4 @@
-# Consistent Token Types Across Python Versions
+# Consistent Tokenizer Across Python Versions
 
 This project is part of [`phy`](https://github.com/phy-precompiler).
 
