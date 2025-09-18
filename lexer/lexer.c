@@ -1,6 +1,6 @@
 #include "Python.h"
 
-#include "../pycore_token.h"
+#include "../_token.h"
 
 // #include "pycore_unicodeobject.h"
 #include "errcode.h"

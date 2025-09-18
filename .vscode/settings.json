@@ -3,6 +3,5 @@
         "lexer.h": "c",
         "compare": "c",
         "type_traits": "c",
-        "pycore_token.h": "c"
     }
 }

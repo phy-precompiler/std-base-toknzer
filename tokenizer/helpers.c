@@ -1,6 +1,6 @@
 #include "Python.h"
 #include "errcode.h"
-#include "../pycore_token.h"
+#include "../_token.h"
 
 #include "../lexer/state.h"
 

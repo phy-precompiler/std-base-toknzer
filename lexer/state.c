@@ -1,6 +1,6 @@
 #include "Python.h"
 // #include "pycore_pystate.h"
-#include "../pycore_token.h"
+#include "../_token.h"
 #include "errcode.h"
 
 #include "state.h"

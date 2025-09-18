@@ -12,7 +12,7 @@
 #include "_tokenize.h"
 
 /// this header has been refactored to contains only token type constants
-#include "pycore_token.h"
+#include "_token.h"
 
 /// DO NOT include python internal headers  
 /// #include "internal/pycore_critical_section.h"   // Py_BEGIN_CRITICAL_SECTION
