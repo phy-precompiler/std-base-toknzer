@@ -509,7 +509,9 @@ verify_identifier(struct tok_state *tok)
         }
         return 0;
     }
-    Py_ssize_t invalid = _PyUnicode_ScanIdentifier(s);
+    /// Py_ssize_t invalid = _PyUnicode_ScanIdentifier(s);
+    Py_ssize_t invalid = PyUnicode_IsIdentifier(s);
+
     assert(invalid >= 0);
     assert(PyUnicode_GET_LENGTH(s) > 0);
     if (invalid < PyUnicode_GET_LENGTH(s)) {
