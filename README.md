@@ -50,3 +50,12 @@ Think of it as a **"frozen" token ID specification**: even as Python evolves, yo
 ```bash
 pip install phy-std-base-toknzer
 ```
+
+
+## Development
+
+This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-build-core), `cmake` is needed for building the wheel.
+
+```bash
+pip install .
+```
