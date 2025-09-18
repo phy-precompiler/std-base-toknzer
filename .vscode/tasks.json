@@ -2,10 +2,10 @@
     "version": "2.0.0",
     "tasks": [
     {
-      "label": "uv build",
+      "label": "pip build",
       "type": "shell",
-      "command": "uv",
-      "args": ["pip", "install", "."],
+      "command": "pip",
+      "args": ["wheel", ".", "-w", "dist/"],
       "problemMatcher": []
     }
   ]
