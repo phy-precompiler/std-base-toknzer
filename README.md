@@ -98,6 +98,8 @@ This repository extracts the **core logic of `tokenize`** from the upcoming **Py
 
 With this library, the **same token type always maps to the same integer value** no matter which Python version you are running.
 
+This library has **ZERO** dependencies.
+
 ---
 
 ## This library is helpeful for
