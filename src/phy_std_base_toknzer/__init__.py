@@ -13,9 +13,9 @@ import itertools
 import collections
 from typing import Generator
 
-from std_base_toknzer import tok_def
+from phy_std_base_toknzer import tok_def
 # local imports; pylint: disable=import-error,no-name-in-module
-from std_base_toknzer._tokenize import TokenizerIter
+from phy_std_base_toknzer._tokenize import TokenizerIter
 
 
 class StdTokInfo(collections.namedtuple('StdTokInfo', 'type string start end line')):
