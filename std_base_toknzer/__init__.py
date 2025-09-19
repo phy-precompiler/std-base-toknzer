@@ -21,7 +21,7 @@ from std_base_toknzer._tokenize import TokenizerIter
 class StdTokInfo(collections.namedtuple('StdTokInfo', 'type string start end line')):
     """ overwrite `repr` of builtin `TokenInfo` namedTuple """
     def __repr__(self):
-        annotated_type = f'{self.type} ({getattr(tok_def, tok_def.tok_name[self.type])})'
+        annotated_type = f'{self.type} ({tok_def.tok_name[self.type]})'
         # pylint: disable=line-too-long
         return f'TokenInfo(type={annotated_type}, string={self.string}, start={self.start}, end={self.end}, line={self.line})'
 
