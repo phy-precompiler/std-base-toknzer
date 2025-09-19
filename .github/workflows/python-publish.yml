@@ -29,14 +29,18 @@ jobs:
       - name: Build release distributions
         run: |
           # NOTE: put your own distribution build steps here.
-          python -m pip install uv
+          python -m pip install uv auditwheel
           uv build
+          mkdir -p dist/repaired
+          for whl in dist/*.whl; do
+            auditwheel repair "$whl" -w dist/repaired/
+          done
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: dist/repaired
 
   pypi-publish:
     runs-on: ubuntu-latest
