@@ -12,7 +12,7 @@ from tokenize import detect_encoding, TokenError, TokenInfo as BuiltinTokenInfo
 import itertools
 from typing import Generator
 
-# local imports
+# local imports; pylint: disable=import-error,no-name-in-module
 from std_base_toknzer._tokenize import TokenizerIter
 
 

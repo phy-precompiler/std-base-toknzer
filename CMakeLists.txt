@@ -21,3 +21,8 @@ python_add_library(
 )
 
 install(TARGETS _tokenize DESTINATION .)
+install(
+  FILES std_base_toknzer/__init__.py
+        std_base_toknzer/_tokenize.pyi
+  DESTINATION .
+)
