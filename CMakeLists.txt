@@ -8,15 +8,15 @@ find_package(
 
 python_add_library(
   std_base_toknzer MODULE 
-  std_base_toknzer_module.c 
-  _tokenize.c
-  lexer/buffer.c
-  lexer/lexer.c
-  lexer/state.c
-  tokenizer/helpers.c
-  tokenizer/readline_tokenizer.c
-  tokenizer/string_tokenizer.c
-  tokenizer/utf8_tokenizer.c
+  std_base_toknzer/std_base_toknzer_module.c 
+  std_base_toknzer/_tokenize.c
+  std_base_toknzer/lexer/buffer.c
+  std_base_toknzer/lexer/lexer.c
+  std_base_toknzer/lexer/state.c
+  std_base_toknzer/tokenizer/helpers.c
+  std_base_toknzer/tokenizer/readline_tokenizer.c
+  std_base_toknzer/tokenizer/string_tokenizer.c
+  std_base_toknzer/tokenizer/utf8_tokenizer.c
   WITH_SOABI
 )
 
