@@ -1,6 +1,6 @@
 """ Interfaces of c module. """
 # imports
-from typing import Callable, Iterator, Tuple, Optional, Generator
+from typing import Callable, Iterator, Tuple, Optional
 
 # typings
 _Pos = Tuple[int, int]

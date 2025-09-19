@@ -13,7 +13,7 @@ import itertools
 from typing import Generator
 
 # local imports
-from std_base_toknzer import TokenizerIter
+from std_base_toknzer._tokenize import TokenizerIter
 
 
 # token type definitions; these are the same as python 3.14
