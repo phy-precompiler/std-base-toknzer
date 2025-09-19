@@ -21,7 +21,7 @@ static PyModuleDef_Slot tokenizemodule_slots[] = {
     {0, NULL}
 };
 
-static struct PyModuleDef std_base_toknzer_module = {
+static struct PyModuleDef _tokenizemodule = {
     PyModuleDef_HEAD_INIT, 
     "std_base_toknzer",
     .m_size = sizeof(tokenize_state),
@@ -33,6 +33,6 @@ static struct PyModuleDef std_base_toknzer_module = {
 };
 
 /** name here must match extension name, with `PyInit_` prefix */
-PyMODINIT_FUNC PyInit_std_base_toknzer(void) {
-    return PyModuleDef_Init(&std_base_toknzer_module);
+PyMODINIT_FUNC PyInit__tokenizemodule(void) {
+    return PyModuleDef_Init(&_tokenizemodule);
 }
