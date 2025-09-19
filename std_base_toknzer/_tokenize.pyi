@@ -8,7 +8,7 @@ _BareTokenInfo = Tuple[int, str, _Pos, Optional[_Pos]]
 
 
 class TokenizerIter(Iterator[_BareTokenInfo]):
-    """ interface of c method will create iterator of tokens """
+    """ interface of c method which creates iterator of tokens """
 
     # pylint: disable=unused-argument
     def __init__(

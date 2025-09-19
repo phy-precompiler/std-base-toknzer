@@ -20,9 +20,9 @@ python_add_library(
   WITH_SOABI
 )
 
-install(TARGETS _tokenize DESTINATION .)
+install(TARGETS _tokenize DESTINATION std_base_toknzer)
 install(
   FILES std_base_toknzer/__init__.py
         std_base_toknzer/_tokenize.pyi
-  DESTINATION .
+  DESTINATION std_base_toknzer
 )

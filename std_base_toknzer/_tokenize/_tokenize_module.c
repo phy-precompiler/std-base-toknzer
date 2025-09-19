@@ -33,6 +33,6 @@ static struct PyModuleDef _tokenizemodule = {
 };
 
 /** name here must match extension name, with `PyInit_` prefix */
-PyMODINIT_FUNC PyInit__tokenizemodule(void) {
+PyMODINIT_FUNC PyInit__tokenize(void) {
     return PyModuleDef_Init(&_tokenizemodule);
 }
