@@ -129,37 +129,33 @@ pip install phy-std-base-toknzer
 
 ## How to use
 
-Use this library is like using builtin method `tokenize.tokenize`:
-+ first, import this module `std_base_toknzer`;
-+ then, create an `io.IOBase.readline()` object from code string;
-+ create an iterator by `TokenizerIter`, which will generate tokens.
-
-The generated token are 4-elements tuple like builtin `tokenize.TokenInfo` object:
-`(type, string, (start_lineno, start_col_offset), (end_lineno, end_col_offset))`.
-
-It is not nameTuple like `tokenize.TokenInfo` gives, you can only get attributes by subscript. `type` is the 
-token type int value defined in `token` module of python 3.14.
+Use this library absolutely the same as builtin `tokenize` module:
 
 ```python
-from io import BytesIO
+from io import BytesIO, StringIO
 import std_base_toknzer
 
 code = '''print(f"hello world to {greeter}!")\ntemplate=t"input a {name}"\n'''
 code_readline = BytesIO(code.encode('utf-8')).readline
+code_str_readline = StringIO(code).readline
 
-_iter = std_base_toknzer.TokenizerIter(code_readline, encoding='utf-8')
-for _token in _iter:
+for _token in std_base_toknzer.tokenize(code_readline):
+    print(_token)
+    print(type(_token))
+
+# or
+for _token in std_base_toknzer.generate_tokens(code_str_readline):
     print(_token)
     print(type(_token))
 ```
 
-
-
+The generated token are `namedTuple` with fields the same as builtin `tokenize.TokenInfo`. 
 
 ## Development
 
-This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-build-core), `cmake` is needed for building the wheel.
+This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-build-core) and 
+[`uv`](https://github.com/astral-sh/uv) to build; `cmake` is a dependency of `scikit-build-core`.
 
 ```bash
-pip install .
+uv build
 ```

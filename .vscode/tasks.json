@@ -2,18 +2,19 @@
     "version": "2.0.0",
     "tasks": [
     {
-      "label": "pip build",
+      "label": "uv build",
       "type": "shell",
-      "command": "pip",
-      "args": ["wheel", ".", "-w", "dist/"],
+      "command": "uv",
+      "args": ["build"],
       "problemMatcher": []
     },
     {
-      "label": "pip install",
+      "label": "uv sync",
       "type": "shell",
-      "command": "pip",
-      "args": ["install", "."],
-      "problemMatcher": []
+      "command": "uv",
+      "args": ["sync"],
+      "problemMatcher": [],
+      "dependsOn": ["uv build"]
     }
   ]
 }
