@@ -82,6 +82,7 @@
 #define COMMENT         65
 #define NL              66
 #define ERRORTOKEN      67
+#define ENCODING        68  // this is addtional for pyi
 #define N_TOKENS        69
 #define NT_OFFSET       256
 
