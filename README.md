@@ -104,11 +104,11 @@ This library has **ZERO** dependencies.
 
 ## This library is helpeful for
 
-- Tools like linters, formatters, or static analyzers often depend on token IDs.  
-- If these IDs change between Python versions, cross-version compatibility needs extra works.  
-- By standardizing on the **3.14 token ID mapping**, this project ensures stability and reproducibility.
+- Tools like linters, formatters, or static analyzers often depend on token int values.  
+- If these int values change between Python versions, cross-version compatibility needs extra works.  
+- By standardizing on the **3.14 token type int value mapping**, this project ensures stability and reproducibility.
 
-Think of it as a **"frozen" token ID specification**: even as Python evolves, your code will see a consistent view of the token stream.
+Think of it as a **"frozen" token type int value specification**: even as Python evolves, your code will see a consistent view of the token stream.
 
 ---
 
@@ -116,7 +116,7 @@ Think of it as a **"frozen" token ID specification**: even as Python evolves, yo
 
 - ✅ Extracted directly from CPython 3.14’s `tokenize` implementation.  
 - ✅ Compatible with Python 3.10–3.14.  
-- ✅ Guarantees **stable token type IDs** across versions.  
+- ✅ Guarantees **stable token type int values** across versions.  
 - ✅ Drop-in replacement for projects that care about token stability.  
 
 ---
@@ -149,7 +149,10 @@ for _token in std_base_toknzer.generate_tokens(code_str_readline):
     print(type(_token))
 ```
 
-The generated token are `namedTuple` with fields the same as builtin `tokenize.TokenInfo`. 
+The generated token is 5-elements `namedTuple` inherited from `tokenize.TokenInfo`, with `__repr__` 
+method overwritten since this method is dependent on `token` module of current python version. 
+The generated token type int value (the first element) should be interpreted with 3.14 token type 
+tables, as provided by `std_base_toknzer.tok_def` submodule.
 
 ## Development
 

@@ -24,5 +24,6 @@ install(TARGETS _tokenize DESTINATION std_base_toknzer)
 install(
   FILES std_base_toknzer/__init__.py
         std_base_toknzer/_tokenize.pyi
+        std_base_toknzer/tok_def.py
   DESTINATION std_base_toknzer
 )

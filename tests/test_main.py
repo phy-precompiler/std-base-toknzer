@@ -1,9 +1,8 @@
 # pylint: disable=missing-function-docstring,unused-import
 """ main test cases """
 # imports
-from io import BytesIO
+from io import BytesIO, StringIO
 from pprint import pprint
-import token
 import pytest
 
 
@@ -32,10 +31,16 @@ def test_std_base_toknzer():
 def test_std_base_toknzer_interface():
     code = '''print(f"hello world to {greeter}!")\ntemplate=t"input a {name}"\n'''
     code_readline = BytesIO(code.encode('utf-8')).readline
+    code_str_readline = StringIO(code).readline
 
     # pylint: disable=import-outside-toplevel
     import std_base_toknzer
 
     for _token in std_base_toknzer.tokenize(code_readline):
+        print(_token)
+        print(type(_token))
+
+    # or
+    for _token in std_base_toknzer.generate_tokens(code_str_readline):
         print(_token)
         print(type(_token))
