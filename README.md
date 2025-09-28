@@ -139,11 +139,11 @@ code = '''print(f"hello world to {greeter}!")\ntemplate=t"input a {name}"\n'''
 code_readline = BytesIO(code.encode('utf-8')).readline
 code_str_readline = StringIO(code).readline
 
-for _token in std_base_toknzer.tokenize(code_readline):
+for _token in phy_std_base_toknzer.tokenize(code_readline):
     print(_token)
 
 # or
-for _token in std_base_toknzer.generate_tokens(code_str_readline):
+for _token in phy_std_base_toknzer.generate_tokens(code_str_readline):
     print(_token)
 ```
 
