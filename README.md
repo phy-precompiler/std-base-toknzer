@@ -75,8 +75,8 @@ Python's built-in [`token`](https://docs.python.org/3/library/token.html) module
 | TSTRING_START    |             |             |             |             | 62          |
 | TSTRING_MIDDLE   |             |             |             |             | 63          |
 | TSTRING_END      |             |             |             |             | 64          |
-| COMMENT          |             |             | 64          | 62          | 65          |
-| NL               |             |             | 65          | 63          | 66          |
+| COMMENT          | 61          | 61          | 64          | 62          | 65          |
+| NL               | 62          | 62          | 65          | 63          | 66          |
 | ERRORTOKEN       | 60          | 60          | 66          | 64          | 67          |
 | N_TOKENS         | 64          | 64          | 68          | 66          | 69          |
 | NT_OFFSET        | 256         | 256         | 256         | 256         | 256         |
