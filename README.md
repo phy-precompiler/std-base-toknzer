@@ -160,3 +160,9 @@ This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-bu
 ```bash
 uv build
 ```
+
+### Reminder: build on Windows
+
+If you use `visual c++` as compiler to build this package, to avoid error "The C compiler identification is unknown", it is better to use `Command Prompt for VS` app to execute the build command.
+
+If error "The C compiler identification is unknown. CMAKE_C_COMPILER could be found" encountered but you have Visual C++ installed, try to install the component `Desktop development with C++`.
