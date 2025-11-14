@@ -92,7 +92,10 @@ jobs:
       # Download release assets (there may be Windows platform wheels)
       - name: Download Release Assets
         run: |
-          gh release download ${{ github.event.release.tag_name }} --pattern "*.whl" --dir dist
+          gh release download ${{ github.event.release.tag_name }} \
+            --repo ${{ github.repository }} \
+            --pattern "*.whl" \
+            --dir dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
