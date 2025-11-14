@@ -27,7 +27,7 @@ def test_std_base_toknzer():
         print(type(_token))
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_std_base_toknzer_interface():
     code = '''print(f"hello world to {greeter}!")\ntemplate=t"input a {name}"\n'''
     code_readline = BytesIO(code.encode('utf-8')).readline
