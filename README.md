@@ -114,10 +114,9 @@ Think of it as a **"frozen" token type int value specification**: even as Python
 
 ## Features
 
-- ✅ Extracted directly from CPython 3.14’s `tokenize` implementation.  
-- ✅ Compatible with Python 3.10–3.14.  
-- ✅ Guarantees **stable token type int values** across versions.  
-- ✅ Drop-in replacement for projects that care about token stability.  
+- Extracted directly from CPython 3.14’s `tokenize` implementation.  
+- Compatible with Python 3.10–3.14.  
+- Guarantees **stable token type int values** across versions.  
 
 ---
 
@@ -126,6 +125,8 @@ Think of it as a **"frozen" token type int value specification**: even as Python
 ```bash
 pip install phy-std-base-toknzer
 ```
+
+On Windows, see [build](#build-on-windows).
 
 ## How to use
 
@@ -152,7 +153,7 @@ method overwritten since this method is dependent on `token` module of current p
 The generated token type int value (the first element) should be interpreted with 3.14 token type 
 tables, as provided by `std_base_toknzer.tok_def` submodule.
 
-## Development
+## Build
 
 This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-build-core) and 
 [`uv`](https://github.com/astral-sh/uv) to build; `cmake` is a dependency of `scikit-build-core`.
@@ -161,7 +162,7 @@ This library use [`scikit-build-core`](https://github.com/scikit-build/scikit-bu
 uv build
 ```
 
-### Reminder: build on Windows
+### build on Windows
 
 If you use `visual c++` as compiler to build this package, to avoid error "The C compiler identification is unknown", it is better to use `Command Prompt for VS` app to execute the build command.
 
