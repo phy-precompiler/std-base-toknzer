@@ -6,6 +6,8 @@ __all__ = [
     'tokenize',
     'StdTokInfo',
 ]
+__version__ = '0.3.0'
+
 
 # imports
 from tokenize import detect_encoding, TokenError
