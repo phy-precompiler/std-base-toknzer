@@ -6,7 +6,7 @@ __all__ = [
     'tokenize',
     'StdTokInfo',
 ]
-__version__ = '0.3.17'
+__version__ = '0.1.1'
 
 
 # imports

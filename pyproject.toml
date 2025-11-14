@@ -1,6 +1,6 @@
 [project]
 name = "phy-std-base-toknzer"
-version = "0.3.17"
+version = "0.1.1"
 description = "Base tokenizer for phy project extracted from python 3.14 builtin tokenize module"
 authors = [
     {name = "alfred-du",email = "ihearmywords@hotmail.com"}
