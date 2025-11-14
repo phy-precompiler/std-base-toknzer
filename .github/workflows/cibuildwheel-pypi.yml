@@ -71,7 +71,9 @@ jobs:
 
       - name: Flatten wheels
         run: |
-          find dist -name '*.whl' -exec cp {} dist \;
+          shopt -s globstar
+          cp dist/**/*.whl dist/
+          rm -rf dist/*/
 
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
