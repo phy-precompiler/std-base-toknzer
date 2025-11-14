@@ -1,10 +1,24 @@
 # Consistent Tokenizer Across Python Versions
 
+<p align="left">
+  <a href="#"><img alt="PyPI" src="https://img.shields.io/pypi/v/phy-std-base-toknzer.svg"></a>
+  <a href="#"><img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/phy-std-base-toknzer.svg"></a>
+  <a href="#"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+</p>
+
 This project is part of [`phy`](https://github.com/phy-precompiler).
 
 ## Overview
 
-Python's built-in [`token`](https://docs.python.org/3/library/token.html) module assigns an **integer value** to each token type. However, these numeric values are **not guaranteed to be stable** across Python versions.  
+This package provides a replacement for Python builtin `tokenize` module and behaves consistently across active python versions.
+
+The differences of builtin `tokenize` module among versions includes:
+
+- Since Python 3.12, new fstring related token types `FSTRING_START`, `FSTRING_MIDDLE` & `FSTRING_END` were introduced for [PEP 701](https://peps.python.org/pep-0701/), along with notable performance enhancements.
+
+- Python 3.14 brings new token types `TSTRING_START`, `TSTRING_MIDDLE` & `TSTRING_END` for new syntax [Template String](https://peps.python.org/pep-0750/).
+
+- Python's built-in [`token`](https://docs.python.org/3/library/token.html) module assigns an **integer value** to each token type. However, these numeric values are **not guaranteed to be stable** across Python versions: 
 
 | token type       | python 3.10 | python 3.11 | python 3.12 | python 3.13 | python 3.14 |
 |------------------|-------------|-------------|-------------|-------------|-------------|
@@ -82,51 +96,26 @@ Python's built-in [`token`](https://docs.python.org/3/library/token.html) module
 | NT_OFFSET        | 256         | 256         | 256         | 256         | 256         |
 
 
-This may lead to necessary extra works about token codes alignment if your project relies on consistent numeric token codes across environments (e.g., for serialization, tooling, or cross-version analysis).
+This may lead to necessary extra works about token codes alignment if your project relies on consistent numeric token codes across environments.
 
 ---
 
 ## What this Project Does
 
-This repository extracts the **core logic of `tokenize`** from the upcoming **Python 3.14 source code** and provides a compatibility layer that works consistently on:
+This repository extracts the c code related to `lexer` & `tokenize` from CPython 3.14 source code (the latest Python version), and build a standalone python package with the same Python API as built-in `tokenize` module. 
 
-- Python **3.10**
-- Python **3.11**
-- Python **3.12**
-- Python **3.13**
-- Python **3.14 (future release)**
+Use this package to tokenize python codes will produce the same results, regardless of which version of python interpreter is used.
 
-With this library, the **same token type always maps to the same integer value** no matter which Python version you are running.
+This package has **ZERO** dependencies.
 
-This library has **ZERO** dependencies.
-
----
-
-## This library is helpeful for
-
-- Tools like linters, formatters, or static analyzers often depend on token int values.  
-- If these int values change between Python versions, cross-version compatibility needs extra works.  
-- By standardizing on the **3.14 token type int value mapping**, this project ensures stability and reproducibility.
-
-Think of it as a **"frozen" token type int value specification**: even as Python evolves, your code will see a consistent view of the token stream.
-
----
-
-## Features
-
-- Extracted directly from CPython 3.14’s `tokenize` implementation.  
-- Compatible with Python 3.10–3.14.  
-- Guarantees **stable token type int values** across versions.  
-
----
 
 ## Installation
 
-```bash
+```shell
 pip install phy-std-base-toknzer
 ```
 
-On Windows, see [build](#build-on-windows).
+If theres is issue in installing on Windows, refer to [build-on-windows](#build-on-windows) to built it by ones own.
 
 ## How to use
 
