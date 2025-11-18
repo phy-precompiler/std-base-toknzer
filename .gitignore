@@ -5,9 +5,8 @@ __pycache__/
 .tool-versions
 
 dist/
-.env
-
-uv.lock
-
+build/
 CMakeCache.txt
 CMakeFiles/
+
+uv.lock
