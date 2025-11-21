@@ -105,6 +105,7 @@ jobs:
     needs:
       - build_sdist
       - build_wheels
+      - build_wheels_win32
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
