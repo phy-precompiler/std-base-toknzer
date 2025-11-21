@@ -39,7 +39,7 @@ jobs:
           [
             ubuntu-latest,
             ubuntu-24.04-arm,
-            windows-latest,
+            # windows-latest,
             # windows-11-arm,
             # macos-15-intel,
             macos-latest,
@@ -67,6 +67,41 @@ jobs:
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: wheelhouse/*.whl
+
+  build_wheels_win32:
+    name: Build wheels on Windows with ${{ matrix.pyversion }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        pyversion:
+          [
+            '310',
+            '311',
+            '312',
+            '313',
+            '314',
+          ]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: MinoruSekine/setup-scoop@v4.0.2
+        with:
+          buckets: versions
+          apps: python${{ matrix.pyversion }}
+
+      - name: Install uv
+        run: |
+          scoop reset python${{ matrix.pyversion }}
+          pip install uv
+
+      - name: Build wheels
+        run: uv build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uv-wheels-${{ matrix.pyversion }}-${{ strategy.job-index }}
+          path: dist/*.whl
 
   pypi-publish:
     runs-on: ubuntu-latest
