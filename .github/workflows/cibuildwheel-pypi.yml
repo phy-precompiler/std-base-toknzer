@@ -88,15 +88,12 @@ jobs:
       - uses: MinoruSekine/setup-scoop@v4.0.2
         with:
           buckets: versions
-          apps: python${{ matrix.pyversion }}
-
-      - name: Install uv
-        run: |
-          scoop reset python${{ matrix.pyversion }}
-          pip install uv
+          apps: uv python${{ matrix.pyversion }}
 
       - name: Build wheels
-        run: uv build
+        run: |
+          scoop reset python${{ matrix.pyversion }}  
+          uv build
 
       - uses: actions/upload-artifact@v4
         with:
