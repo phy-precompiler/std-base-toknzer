@@ -5,6 +5,7 @@ description = "Base tokenizer for phy project extracted from python 3.14 builtin
 authors = [
     {name = "alfred-du",email = "ihearmywords@hotmail.com"}
 ]
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10, <4"
 classifiers = [
@@ -21,7 +22,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/phy-precompiler/std-base-toknzer"
 Repository = "https://github.com/phy-precompiler/std-base-toknzer"
-Issues = "https://github.com/phy-precompiler/std-base-toknze/issues"
+Issues = "https://github.com/phy-precompiler/std-base-toknzer/issues"
 
 [dependency-groups]
 dev = [
