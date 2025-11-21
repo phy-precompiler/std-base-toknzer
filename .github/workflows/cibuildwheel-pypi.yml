@@ -97,7 +97,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: uv-wheels-${{ matrix.pyversion }}-${{ strategy.job-index }}
+          name: win32-wheels-${{ matrix.pyversion }}-${{ strategy.job-index }}
           path: dist/*.whl
 
   pypi-publish:
@@ -121,16 +121,6 @@ jobs:
       # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
 
     steps:
-      # Download release assets (there may be Windows platform wheels)
-      - name: Download Release Assets
-        run: |
-          gh release download ${{ github.event.release.tag_name }} \
-            --repo ${{ github.repository }} \
-            --pattern "*.whl" \
-            --dir dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Retrieve release distributions
         uses: actions/download-artifact@v4
         with:
