@@ -68,7 +68,7 @@ jobs:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: wheelhouse/*.whl
 
-  build_macos:
+  build_wheels_macos:
     name: Build wheels on macOS ARM with ${{ matrix.py_version }}
     runs-on: macos-latest
     strategy:
@@ -138,6 +138,7 @@ jobs:
     needs:
       - build_sdist
       - build_wheels
+      - build_wheels_macos
       - build_wheels_win32
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
